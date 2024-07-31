@@ -71,6 +71,29 @@ const google = () => {
         },
       });
     },
+
+    /**
+     * data: [
+     *    {
+     *      range: ...,
+     *      majorDimension: "ROWS",
+     *      values: [
+     *        {
+     *          ...
+     *        },
+     *      ]
+     *    },
+     * ]
+     */
+    batchUpdate: async ({ spreadsheetId, data }) => {
+      return await createSheetsClient().spreadsheets.values.batchUpdate({
+        spreadsheetId,
+        requestBody: {
+          valueInputOption: "USER_ENTERED",
+          data, // array of ValueRanges
+        },
+      });
+    },
   };
 };
 

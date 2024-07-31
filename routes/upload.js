@@ -42,8 +42,7 @@ router.post("/", async (req, res) => {
     }).then(async (response) => {
       const fileBuffer = await buffer(response.data);
 
-      // TODO: Get default folder ID
-      await google.createFile({
+      const data = await google.createFile({
         driveId: gDriveFolderId,
         fileName: filename,
         fileBuffer,
@@ -52,16 +51,38 @@ router.post("/", async (req, res) => {
       console.log(
         `${filename} uploaded to Google Drive (Folder ID: ${gDriveFolderId})`
       );
+
+      const { id: fileId } = data.data;
+
+      await google.batchUpdate({
+        spreadsheetId: googleSheetUI.id,
+        data: [
+          // Set PDF Generated to true
+          {
+            range: `Inspections!B${rowNumber}:B${rowNumber}`,
+            majorDimension: "ROWS",
+            values: [[true]],
+          },
+          // Insert PDF sharing link
+          {
+            range: `Inspections!E${rowNumber}:E${rowNumber}`,
+            majorDimension: "ROWS",
+            values: [[`https://drive.google.com/file/d/${fileId}/view`]],
+          },
+        ],
+      });
+
+      console.log(`Status changed to PDF Generated on row ${rowNumber}`);
     });
 
-    // Set status to "PDF Created"
-    await google.updateRange({
-      spreadsheetId: googleSheetUI.id,
-      range: `Inspections!B${rowNumber}:B${rowNumber}`,
-      values: [[true]],
-    });
+    // // Set status to "PDF Created"
+    // await google.updateRange({
+    //   spreadsheetId: googleSheetUI.id,
+    //   range: `Inspections!B${rowNumber}:B${rowNumber}`,
+    //   values: [[true]],
+    // });
 
-    console.log(`Status changed to PDF Generated on row ${rowNumber}`);
+    // console.log(`Status changed to PDF Generated on row ${rowNumber}`);
 
     res.sendStatus(200);
   } catch (error) {

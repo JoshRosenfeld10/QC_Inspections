@@ -1,1 +1,21 @@
-module.exports = {};
+module.exports = {
+  indices: {
+    status: 2,
+    fileName: 3,
+    gDriveFolderId: 5,
+    jobNumber: 6,
+    inspectionName: 7,
+    inspectionType: 9,
+    site: 10,
+    totalScorePercentage: 11,
+    inspectionResult: 12,
+    notes: 14,
+    kitPartNumber: 15,
+    serialSeqNumber: 16,
+    submittedBy: 17,
+    submissionDate: 18,
+    totalQuestions: 20,
+    question1: 22,
+  },
+  id: "1MMhENQNeBaf9AZr7wfKtOvOZf_mBKh--BEXDv7bvh-Q",
+};

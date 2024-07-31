@@ -1,4 +1,5 @@
 const googleSheetUI = require("../constants/googleSheetUI"),
+  constants = require("../constants/constants"),
   getDataURI = require("./getDataURI");
 
 const formatInputData = async (rowData) => {
@@ -21,7 +22,11 @@ const formatInputData = async (rowData) => {
     rowData[indices.inspectionResult].toLowerCase() || "";
   data["submitted_by"] = rowData[indices.submittedBy] || "";
   data["submission_date"] = rowData[indices.submissionDate] || "";
-  data["gdrive_folder_id"] = rowData[indices.gDriveFolderId] || "";
+  data["gdrive_folder_id"] =
+    rowData[indices.gDriveFolderId] === "" ||
+    rowData[indices.gDriveFolderId] === undefined
+      ? constants.defaultGDriveFolderId
+      : rowData[indices.gDriveFolderId];
   data["file_name"] = rowData[indices.fileName] || "";
 
   for (let i = 0; i < totalQuestions; i++) {

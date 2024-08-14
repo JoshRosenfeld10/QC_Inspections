@@ -9,7 +9,7 @@ router.use(express.json());
 
 router.post("/", async (req, res) => {
   try {
-    const { row: rowNumber } = req.body;
+    const { row: rowNumber, authToken: scriptAppAuthToken } = req.body;
 
     const { data } = await google.getSheetRange({
       spreadsheetId: googleSheetUI.id,
@@ -22,6 +22,7 @@ router.post("/", async (req, res) => {
     await generatePDF({
       body: formattedData,
       rowNumber,
+      scriptAppAuthToken,
     });
 
     res.sendStatus(200);

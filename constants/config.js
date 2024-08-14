@@ -10,4 +10,5 @@ module.exports = {
     client_secret: process.env.GOOGLE_CLIENT_SECRET,
     refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
   },
+  appsScriptUrl: process.env.APPS_SCRIPT_URL,
 };

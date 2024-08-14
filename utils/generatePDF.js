@@ -1,7 +1,7 @@
 const constants = require("../constants/constants"),
   pdfMonkey = require("../constants/pdfMonkey");
 
-const generatePDF = async ({ body, rowNumber }) => {
+const generatePDF = async ({ body, rowNumber, scriptAppAuthToken }) => {
   try {
     await fetch("https://api.pdfmonkey.io/api/v1/documents", {
       method: "POST",
@@ -18,6 +18,8 @@ const generatePDF = async ({ body, rowNumber }) => {
             _filename: body["file_name"],
             gDriveFolderId: body["gdrive_folder_id"],
             rowNumber,
+            userEmail: body["submitted_by"],
+            scriptAppAuthToken,
           },
         },
       }),

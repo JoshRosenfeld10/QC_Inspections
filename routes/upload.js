@@ -3,7 +3,6 @@ const express = require("express"),
   { buffer } = require("node:stream/consumers"),
   google = require("../modules/google"),
   googleSheetUI = require("../constants/googleSheetUI"),
-  sendEmailRequest = require("../utils/sendEmailRequest"),
   router = express.Router();
 
 router.use(express.json());
@@ -33,8 +32,7 @@ router.use(express.json());
 router.post("/", async (req, res) => {
   try {
     const { download_url: downloadUrl, filename } = req.body.document;
-    let { gDriveFolderId, rowNumber, userEmail, scriptAppAuthToken } =
-      JSON.parse(req.body.document.meta);
+    let { gDriveFolderId, rowNumber } = JSON.parse(req.body.document.meta);
 
     // Download stream of PDF
     await axios({
@@ -80,12 +78,6 @@ router.post("/", async (req, res) => {
       });
 
       console.log(`Status changed to PDF Generated on row ${rowNumber}`);
-
-      await sendEmailRequest({
-        email: userEmail,
-        fileLink: `https://drive.google.com/file/d/${fileId}/view`,
-        scriptAppAuthToken,
-      });
     });
 
     res.sendStatus(200);

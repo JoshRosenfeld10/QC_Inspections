@@ -72,17 +72,13 @@ router.post("/", async (req, res) => {
         ],
       });
 
+      // Update file permissions to be accessible to anyone
+      await google.insertVisibleToAnyonePermission({
+        fileId,
+      });
+
       console.log(`Status changed to PDF Generated on row ${rowNumber}`);
     });
-
-    // // Set status to "PDF Created"
-    // await google.updateRange({
-    //   spreadsheetId: googleSheetUI.id,
-    //   range: `Inspections!B${rowNumber}:B${rowNumber}`,
-    //   values: [[true]],
-    // });
-
-    // console.log(`Status changed to PDF Generated on row ${rowNumber}`);
 
     res.sendStatus(200);
   } catch (error) {

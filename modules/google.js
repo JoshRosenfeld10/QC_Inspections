@@ -58,6 +58,38 @@ const google = () => {
       });
     },
 
+    // https://developers.google.com/drive/api/reference/rest/v3/files/get
+    getFile: async ({ fileId }) => {
+      return await createDriveClient().files.get({
+        fileId,
+        supportsAllDrives: true,
+        fields: "*",
+        includePermissionsForView: "published",
+      });
+    },
+
+    // https://developers.google.com/drive/api/reference/rest/v3/permissions/list
+    getFilePermissions: async ({ fileId }) => {
+      return await createDriveClient().permissions.list({
+        fileId,
+        supportsAllDrives: true,
+        includePermissionsForView: "published",
+        fields: "*",
+      });
+    },
+
+    // https://developers.google.com/drive/api/reference/rest/v3/permissions/create
+    insertVisibleToAnyonePermission: async ({ fileId }) => {
+      return await createDriveClient().permissions.create({
+        fileId,
+        requestBody: {
+          type: "anyone",
+          role: "reader",
+        },
+        supportsAllDrives: true,
+      });
+    },
+
     // https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/update
     updateRange: async ({ spreadsheetId, range, values }) => {
       return await createSheetsClient().spreadsheets.values.update({

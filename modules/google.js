@@ -43,19 +43,39 @@ const google = () => {
 
     // https://developers.google.com/drive/api/reference/rest/v3/files/create
     createFile: async ({ driveId, fileName, fileBuffer }) => {
-      return await createDriveClient().files.create({
-        requestBody: {
-          name: fileName,
-          // driveId: "0AAXE2qCY0-BEUk9PVA",
-          parents: [driveId],
-        },
-        media: {
-          body: Readable.from(fileBuffer),
-          mimeType: "application/pdf",
-        },
-        fields: "id",
-        supportsAllDrives: true,
-      });
+      try {
+        return await createDriveClient().files.create({
+          requestBody: {
+            name: fileName,
+            // driveId: "0AAXE2qCY0-BEUk9PVA",
+            parents: [driveId],
+          },
+          media: {
+            body: Readable.from(fileBuffer),
+            mimeType: "application/pdf",
+          },
+          fields: "id",
+          supportsAllDrives: true,
+        });
+      } catch (error) {
+        console.log(
+          `Supplied Google Drive folder ID does not exist: ${driveId}.\nUploading to default folder.`
+        );
+
+        return await createDriveClient().files.create({
+          requestBody: {
+            name: fileName,
+            // driveId: "0AAXE2qCY0-BEUk9PVA",
+            parents: [constants.defaultGDriveFolderId],
+          },
+          media: {
+            body: Readable.from(fileBuffer),
+            mimeType: "application/pdf",
+          },
+          fields: "id",
+          supportsAllDrives: true,
+        });
+      }
     },
 
     // https://developers.google.com/drive/api/reference/rest/v3/files/get

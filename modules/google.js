@@ -2,6 +2,31 @@ const { google: client } = require("googleapis"),
   constants = require("../constants/constants"),
   { Readable } = require("stream");
 
+async function retryWithBackoff(fn, retries = 3, delay = 1000) {
+  let attempt = 0;
+  while (attempt < retries) {
+    try {
+      return await fn();
+    } catch (error) {
+      if (!isTransientError(error) || attempt >= retries - 1) {
+        throw error; // Stop retrying if it's a non-transient error or max retries reached
+      }
+      attempt++;
+      console.warn(
+        `Transient error in insertVisibleToAnyonePermission. Retrying in ${delay}ms...`
+      );
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      delay *= 2; // Exponential backoff
+    }
+  }
+}
+
+function isTransientError(error) {
+  if (!error.response) return false;
+  const transientStatusCodes = [429, 500, 502, 503, 504];
+  return transientStatusCodes.includes(error.response.status);
+}
+
 const google = () => {
   const createDriveClient = () => {
     return client.drive({
@@ -100,15 +125,29 @@ const google = () => {
 
     // https://developers.google.com/drive/api/reference/rest/v3/permissions/create
     insertVisibleToAnyonePermission: async ({ fileId }) => {
-      return await createDriveClient().permissions.create({
-        fileId,
-        requestBody: {
-          type: "anyone",
-          role: "reader",
-        },
-        supportsAllDrives: true,
-      });
+      return await retryWithBackoff(() =>
+        createDriveClient().permissions.create({
+          fileId,
+          requestBody: {
+            type: "anyone",
+            role: "reader",
+          },
+          supportsAllDrives: true,
+        })
+      );
     },
+
+    // https://developers.google.com/drive/api/reference/rest/v3/permissions/create
+    // insertVisibleToAnyonePermission: async ({ fileId }) => {
+    //   return await createDriveClient().permissions.create({
+    //     fileId,
+    //     requestBody: {
+    //       type: "anyone",
+    //       role: "reader",
+    //     },
+    //     supportsAllDrives: true,
+    //   });
+    // },
 
     // https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/update
     updateRange: async ({ spreadsheetId, range, values }) => {
